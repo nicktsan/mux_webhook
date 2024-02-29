@@ -80,7 +80,6 @@ resource "aws_lambda_function" "mux_webhook_lambda" {
 
   environment {
     variables = {
-      # DETAIL_TYPE                = var.detail_type
       MUX_TOKEN_ID               = data.hcp_vault_secrets_secret.mux_access_token_id.secret_value
       MUX_TOKEN_SECRET           = data.hcp_vault_secrets_secret.mux_access_token_secret.secret_value
       MUX_WEBHOOK_SIGNING_SECRET = data.hcp_vault_secrets_secret.mux_webhook_signing_secret.secret_value
@@ -199,8 +198,7 @@ resource "aws_iam_role_policy_attachment" "APIGWPolicyAttachment" {
 
 # Create a REST API Gateway
 resource "aws_api_gateway_rest_api" "mux_webhook_api" {
-  name = var.api_name
-  # body = data.template_file.mux_webhook_api_body.rendered
+  name        = var.api_name
   description = "mux webhook"
 }
 
@@ -274,10 +272,7 @@ resource "aws_api_gateway_method_response" "mux_webhook_api_method_response" {
     "application/json" = "Empty"
   }
 }
-# Forces redeployment of the api gateway after detecting changes
-# resource "terraform_data" "mux_webhook_api_deployment_replacement" {
-#   input = var.revision
-# }
+
 # Create a new API Gateway deployment for the created rest api
 resource "aws_api_gateway_deployment" "mux_webhook_api_deployment" {
   depends_on  = [aws_api_gateway_integration.mux_webhook_api_integration]
@@ -362,30 +357,5 @@ resource "aws_iam_role_policy_attachment" "attach_event_bridge_put_events_policy
   role       = aws_iam_role.mux_webhook_sqs_to_lambda_to_eventbridge_role.name
   policy_arn = aws_iam_policy.event_bridge_put_events_policy.arn
 }
-
-# Create a Log Group for Eventbridge to push logs to
-# resource "aws_cloudwatch_log_group" "mux_webhook_eventbridge_log_group" {
-#   name_prefix = "/aws/mux-webhook-eventbridge/terraform"
-# }
-
-# Create a Log Policy to allow Cloudwatch to Create log streams and put logs
-# resource "aws_cloudwatch_log_resource_policy" "mux_webhook_eventbridge_log_groupPolicy" {
-#   policy_name     = "Terraform-mux_webhook_eventbridge_log_groupPolicy-${data.aws_caller_identity.current.account_id}"
-#   policy_document = data.template_file.mux_webhook_eventbridge_log_groupPolicy_template.rendered
-# }
-
-#Create a new Event Rule
-# resource "aws_cloudwatch_event_rule" "mux_webhook_eventbridge_event_rule" {
-#   name           = var.mux_webhook_eventbridge_event_rule_name
-#   event_pattern  = data.template_file.mux_webhook_eventbridge_event_rule_pattern_template.rendered
-#   event_bus_name = aws_cloudwatch_event_bus.mux_webhook_event_bus.arn
-# }
-
-#Set the log group as a target for the Eventbridge rule
-# resource "aws_cloudwatch_event_target" "mux_webhook_eventbridge_log_group_target" {
-#   rule           = aws_cloudwatch_event_rule.mux_webhook_eventbridge_event_rule.name
-#   arn            = aws_cloudwatch_log_group.mux_webhook_eventbridge_log_group.arn
-#   event_bus_name = aws_cloudwatch_event_bus.mux_webhook_event_bus.arn
-# }
 
 #TODO implement alarm for DLQ

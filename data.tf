@@ -90,21 +90,10 @@ data "hcp_vault_secrets_secret" "mux_webhook_signing_secret" {
   secret_name = var.mux_webhook_signing_secret
 }
 
-# template for the cloudwatch logging policy for eventbridge
-# data "template_file" "mux_webhook_eventbridge_log_groupPolicy_template" {
-#   template = file("./template/mux_webhook_eventbridge_log_groupPolicy.tpl")
-#   todo fix template to allow for logging
-#   vars = {
-#     logGroup     = aws_cloudwatch_log_group.mux_webhook_eventbridge_log_group.arn
-#     eventRuleArn = aws_cloudwatch_event_rule.mux_webhook_eventbridge_event_rule.arn
-#   }
-# }
-
 data "template_file" "mux_webhook_eventbridge_event_rule_pattern_template" {
   template = file("./template/mux_webhook_eventbridge_event_rule_pattern.tpl")
 
   vars = {
-    # account_id  = data.aws_caller_identity.current.account_id
     eventSource = var.mux_lambda_event_source
   }
 }

@@ -43,7 +43,7 @@ const handler: SQSHandler = async (event: SQSEvent/*, context: Context*/): Promi
                                 "data": message.body,
                                 "muxSignature": message.messageAttributes.muxSignature.stringValue
                             }),
-                            DetailType: eventType, //process.env.DETAIL_TYPE,
+                            DetailType: eventType,
                             EventBusName: process.env.MUX_EVENT_BUS,
                             Source: process.env.MUX_LAMBDA_EVENT_SOURCE,
                             Time: new Date
