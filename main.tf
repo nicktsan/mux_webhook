@@ -145,7 +145,7 @@ resource "aws_s3_object" "lambda_utils_layer_s3_storage" {
 }
 
 resource "aws_s3_bucket" "dev_mux_webhook_bucket" {
-  bucket = "movies-mux-webhook-bucket"
+  bucket = "movies-mux-webhook-bucket2"
 
   tags = {
     Name        = "My mux_webhook dev bucket"
@@ -260,6 +260,9 @@ resource "aws_api_gateway_integration_response" "mux_webhook_api_integration_res
   resource_id = aws_api_gateway_resource.mux_webhook_api_resource.id
   http_method = aws_api_gateway_method.mux_webhook_api_method.http_method
   status_code = aws_api_gateway_method_response.mux_webhook_api_method_response.status_code
+  depends_on = [
+    aws_api_gateway_integration.mux_webhook_api_integration
+  ]
 }
 
 # Configure API Gateway method response

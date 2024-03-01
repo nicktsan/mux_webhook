@@ -21,6 +21,7 @@ sync:
 	terraform apply -refresh-only -var-file='input.tfvars' --auto-approve
 
 destroy:
-	terraform destroy -var-file input.tfvars
+	terraform destroy -var-file input.tfvars -auto-approve
 
-all: build package init sync validate plan apply
+all: init sync validate plan apply
+# all: init sync destroy
